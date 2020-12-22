@@ -4,6 +4,6 @@
 
 # How to start the conda environment:
 
->> activate interview_eval	<-- in windows
+>> activate tldr_bot		<-- in windows
 	OR
->> source interview_eval	<-- in mac
+>> source tldr_bot		<-- in mac

@@ -1,4 +1,4 @@
-name: interview_eval
+name: tldr_bot
 channels:
 	- defaults
 dependencies:
