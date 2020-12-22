@@ -1,4 +1,4 @@
-# How to create the conda environment
+# How to create the conda environment:
 
 >> conda env create -f environment.yml
 
