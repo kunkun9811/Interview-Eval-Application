@@ -2,4 +2,9 @@ name: tldr_bot
 channels:
  - defaults
 dependencies:
- - python >=3.7.9
+ - python = 3.8.5
+ - tensorflow = 2.4.0
+ - numpy = 1.19.4
+ - pandas = 1.1.5
+ - sklearn 0.0.13
+ 
