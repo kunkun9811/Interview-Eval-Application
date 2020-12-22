@@ -1,5 +1,5 @@
 name: tldr_bot
 channels:
-	- defaults
+ - defaults
 dependencies:
-	- python >=3.7.9
+ - python >=3.7.9
