@@ -7,3 +7,7 @@
 >> activate tldr_bot		<-- in windows
 	OR
 >> source tldr_bot		<-- in mac
+
+# How to remove the conda environment:
+
+>> conda env remove -n ENV_NAME
