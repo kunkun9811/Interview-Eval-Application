@@ -10,9 +10,13 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^12.5.1",
+<<<<<<< HEAD
     "puppeteer": "^5.5.0"
+  }
+=======
     "dotenv": "^8.2.0",
     "puppeteer": "^5.5.0"
   },
   "type": "module"
+>>>>>>> ca3d696b4c3df267a2bab0dc0c7d4435c2d31f77
 }
