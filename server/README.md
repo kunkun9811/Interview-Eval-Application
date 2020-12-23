@@ -15,6 +15,9 @@
 # setting up the flask server:
 ## on Windows CMD:
 `C:\path\to\file>set FLASK_APP=server.py`, then `flask run`
+
+## on Windows Powershell:
+`PS C:\path\to\app> $env:FLASK_APP = "server.py"`
 ## on Mac:
 `$ export FLASK_APP=hello.py` then 
 `$ flask run`
