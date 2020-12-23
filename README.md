@@ -1,1 +1,1 @@
-# TL;DR Discord Bot
+# TLDR Bot
