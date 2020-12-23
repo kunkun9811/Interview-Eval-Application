@@ -1,0 +1,17 @@
+{
+  "name": "tldr-bot",
+  "version": "1.0.0",
+  "description": "Summarizes articles for you on discord",
+  "main": "TLDRbot.js",
+  "scripts": {
+    "test": "node TLDRbot.js"
+  },
+  "author": "Tom Shih & Timo Chen",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "puppeteer": "^5.5.0"
+  },
+  "type": "module"
+}
