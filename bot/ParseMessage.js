@@ -31,9 +31,8 @@ export const ParseMessage = async message => {
 
       // Navigate to link
       await GoToLink(link);
-    }
-
-    OutputMessage(message);    
+      OutputMessage(message); 
+    }   
   }
 }
 
@@ -51,8 +50,6 @@ const OutputMessage = (msg) => {
 
 /* Creates a page instance */
 const GoToLink = async link => {
-  /* TODO: TESTING - to be deleted */
-
   // Create a browser instance and page instance
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
@@ -74,7 +71,15 @@ const GoToLink = async link => {
   // Print out the search result links
   console.log(texts);
 
-  /* END */
+  // Create a JSON object from the list of <p> tag texts list
+  let texts_json = {};
+  for(let i in texts) {
+    texts_json[i] = texts[i];
+  }
+
+  for(let i in texts_json){
+    console.log(`${i} = ${texts_json[i]}`);
+  }
 
   await browser.close();
 }
