@@ -2,7 +2,10 @@
  * Some Notes:
  *    (1) "link" has to be a full link instead of say "google.com", it has to be "https://www.google.com" <-- might need to mention this in our documentation
  *    (2) Puppetteer doc says that "headless" mode doesn't support navigation to pdf documentation
+ *    (3) ** page.evaluate() is very flexible and easy to use, there are also other function puppeteer provides that have the same function as any document.___ functions w/out calling page.evaluate
  * 
+ * -- Return value of ParseMessage.js --
+ *    (1) I was thinking we can write to a textfile where each line is each <p> tag? In our models, we will just read the textfile and process the data
  */
 
 import {
@@ -54,28 +57,15 @@ const GoToLink = async link => {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
-  // Go to the link - Note
+  // Go to the link
   console.log("Going to: " + link);
   await page.goto(link);
   console.log("Reached: " + link);
-
-  // Modifies the search bar value
-  await page.evaluate(async () => {
-    document.querySelector('input[name="q"]').value = 'displate';
-  });
-
-  // Click the search button
-  await Promise.all([
-    page.waitForNavigation(),     // waitForNavigation - function that waits until a page's certain condition is met, default to "load"
-    page.evaluate(() => {
-      document.querySelector('input[value="Google Search"]').click();
-    })
-  ]);
     
-  // Grab all the links (in this case all the search result links)
+  // Grab all the text in p tags - In our production version we would probably need to handle <p> <span> ... </span> </p> AND <p> ... </p> duplicate text
   var links = await page.evaluate(async () => {
-    let a_elements = Array.from(document.querySelectorAll('a')).slice(50, 60);
-    let links = a_elements.map(a => a.href);
+    let a_elements = Array.from(document.querySelectorAll('p'));
+    let links = a_elements.map(a => a.textContent);
     return links
   });
 
