@@ -61,17 +61,18 @@ const GoToLink = async link => {
   console.log("Going to: " + link);
   await page.goto(link);
   console.log("Reached: " + link);
-    
+
   // Grab all the text in p tags - In our production version we would probably need to handle <p> <span> ... </span> </p> AND <p> ... </p> duplicate text
-  var links = await page.evaluate(async () => {
-    let a_elements = Array.from(document.querySelectorAll('p'));
-    let links = a_elements.map(a => a.textContent);
-    return links
+  var texts = await page.evaluate(async () => {
+    let p_elements = Array.from(document.querySelectorAll('p'));
+    
+    //array of text contained in the p tags
+    let texts = p_elements.map(p => p.textContent);
+    return texts;
   });
 
   // Print out the search result links
-  console.log(links);
-  
+  console.log(texts);
 
   /* END */
 
