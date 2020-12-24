@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response, jsonify
 import json
 import pandas as pd
 app = Flask(__name__)
@@ -12,8 +12,10 @@ def upload_file():
     if request.method == 'POST':
         # data will be json of the form {1: "p1", 2: "p2"}
         #convert into dictionary
-        data = request.json
-        article = "";
-        for key, value in data:
+        text = json.loads(request.data)
+        print(text['0'])
+        article = ""
+        for key, value in text.items():
             article += value + " "
-        print(article)
+        res = make_response(jsonify({"message": "YAY"}), 200)
+        return res
