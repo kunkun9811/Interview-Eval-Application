@@ -71,6 +71,9 @@ const GoToLink = async link => {
   // Print out the search result links
   console.log(texts);
 
+  // Close the browser instance
+  await browser.close();
+
   // Create a JSON object from the list of <p> tag texts list
   let texts_json = {};
   for(let i in texts) {
@@ -81,5 +84,12 @@ const GoToLink = async link => {
     console.log(`${i} = ${texts_json[i]}`);
   }
 
-  await browser.close();
+  // Send data to backend for processing
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(texts_json)
+  })
+  .then(() => {
+    console.log("Data Processed! :)");
+  })
 }
