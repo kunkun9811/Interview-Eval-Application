@@ -12,6 +12,7 @@ import {
   MessageEmbed
 } from 'discord.js';
 import puppeteer from 'puppeteer';
+import fetch from 'fetch';
 
 // Input: !tldr SOME_LINK
 // Output: Some summary of the article/website/etc
