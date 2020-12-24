@@ -12,8 +12,9 @@ import {
   MessageEmbed
 } from 'discord.js';
 import puppeteer from 'puppeteer';
-import fetch from 'fetch';
+import fetch from 'node-fetch';
 
+var API_URL = 'http://127.0.0.1:5000/';
 // Input: !tldr SOME_LINK
 // Output: Some summary of the article/website/etc
 export const ParseMessage = async message => {
@@ -86,11 +87,10 @@ const GoToLink = async link => {
   }
 
   // Send data to backend for processing
-  fetch(API_URL, {
+  fetch(`${API_URL}/datatext`, {
     method: "POST",
     body: JSON.stringify(texts_json)
   })
-  .then(() => {
-    console.log("Data Processed! :)");
-  })
+  .then((response) => response.json())
+  .then(data => console.log(data))
 }
