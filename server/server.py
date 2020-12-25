@@ -1,5 +1,4 @@
 from flask import Flask, request, make_response, jsonify
-
 import json
 import pandas as pd
 app = Flask(__name__)
