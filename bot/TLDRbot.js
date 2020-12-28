@@ -1,8 +1,6 @@
 'use strict';
 
-/**
- * An example of how you can send embeds
- */
+// import environment variables
 import dotenv from 'dotenv';
 dotenv.config();
 
