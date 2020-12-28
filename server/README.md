@@ -4,7 +4,8 @@
 
 # How to start the conda environment:
 ## On Windows:
-`>> activate tldr_bot`
+optional? `conda init powershell/bash/shellname`
+`>> conda activate tldr_bot` OR `>> activate tldr_bot`
 ## On Mac:
 `>> source tldr_bot`
 
@@ -14,10 +15,12 @@
 
 # setting up the flask server:
 ## on Windows CMD:
-`C:\path\to\file>set FLASK_APP=server.py`, then `flask run`
+`C:\path\to\file>set FLASK_APP=server.py`
+`flask run`
 
 ## on Windows Powershell:
 `PS C:\path\to\app> $env:FLASK_APP = "server.py"`
+`$ flask run`
 ## on Mac:
-`$ export FLASK_APP=hello.py` then 
+`$ export FLASK_APP=hello.py`
 `$ flask run`
