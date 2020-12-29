@@ -30,28 +30,34 @@ export const ParseMessage = async message => {
     if (tokens[0] === "!tldr" && tokens[1].length != 0) {
       // process the second token (the link)
       let link = tokens[1];
+      //TODO: return link, go to link in TLDRbot.js 
 
       // Navigate to link
-      await GoToLink(link);
-      OutputMessage(message); 
-    }   
+      const response = await GoToLink(link).then(response => {
+        //when promise is resolved, set message and return
+        console.log("ParseMessage message: " + JSON.stringify(response));
+        return response;
+      });
+      //TODO: Output message in TLDRbot.js
+      OutputMessage(message, response["message"]);
+    }
   }
 }
 
 /* outputs embedded message to discord chat */
-const OutputMessage = (msg) => {
+export const OutputMessage = (msg, summary) => {
   // create MessageEmbed instance
   const embed = new MessageEmbed()
     .setTitle('A slick little embed')   // Set the title of the field
     .setColor(0xff0000)                 // Set the color of the embed
-    .setDescription('Hello, this is a slick embed!');   // Set the main content of the embed
+    .setDescription(summary);   // Set the main content of the embed
   
   // Send the embed to the same channel as the message
   msg.channel.send(embed);
 }
 
 /* Creates a page instance */
-const GoToLink = async link => {
+export const GoToLink = async link => {
   // Create a browser instance and page instance
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
@@ -86,14 +92,25 @@ const GoToLink = async link => {
     console.log(`${i} = ${texts_json[i]}`);
   }
 
-  // Send data to backend for processing
-  fetch(`${API_URL}/datatext`, {
+  return fetch(`${API_URL}/datatext`, {
     method: "POST",
     body: JSON.stringify(texts_json)
   })
-  .then((response) => response.json())
-  .then(data => console.log(data))
-  .catch(error => {
-    console.log(error);
+  .then((response) => {
+    if(!response.ok){
+      //throw error for catch block
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }else{
+      return response.json();
+    }
+  })
+  .then(responseJson => {
+    //console.log("logging data: " + JSON.stringify(responseJson));
+    return responseJson;
+  })
+  .catch(e => {
+    //catch errors in fetch
+    console.log("Error with fetch: " + e.message);
+    return e;
   });
 }
