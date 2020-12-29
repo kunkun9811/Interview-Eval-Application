@@ -5,11 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Extract the required classes from the discord.js module
-import { Client, MessageEmbed } from 'discord.js';
+import { Client } from 'discord.js';
 
 /** Parsing helper function */
 // const {ParseMessage}  = require('./ParseMessage');
-import {ParseMessage} from './ParseMessage.js';
+import { ParseMessage } from './ParseMessage.js';
 // Create an instance of a Discord client
 const client = new Client();
 
@@ -23,7 +23,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-  ParseMessage(message);
+  ParseMessage(message); 
 });
 
 // Log our bot in using the token from https://discord.com/developers/applications
