@@ -3,5 +3,4 @@ node_modules
 __pycache__/
 *.txt
 dataset/
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*.ipynb
+.ipynb_checkpoints/
