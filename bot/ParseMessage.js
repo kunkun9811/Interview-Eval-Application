@@ -9,6 +9,7 @@
  */
 
 import {
+  Message,
   MessageEmbed
 } from 'discord.js';
 import puppeteer from 'puppeteer';
@@ -31,7 +32,7 @@ export const ParseMessage = async message => {
       // process the second token (the link)
       let link = tokens[1];
       //TODO: return link, go to link in TLDRbot.js 
-
+      //TODO: output "Going to: (url.com)"
       // Navigate to link
       const response = await GoToLink(link).then(response => {
         //when promise is resolved, set message and return
