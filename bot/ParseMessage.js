@@ -9,15 +9,25 @@
  */
 
 import {
+  Message,
   MessageEmbed
 } from 'discord.js';
 import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
 
 var API_URL = 'http://127.0.0.1:5000/';
+<<<<<<< HEAD
+=======
+var expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi; // with http
+//var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi                   // without http
+var regex = new RegExp(expression);
+
+//TODO: deprecated; remove after testing
+>>>>>>> testing
 // Input: !tldr SOME_LINK
 // Output: Some summary of the article/website/etc
-export const ParseMessage = async message => {
+
+export const ParseMessageOld = async message => {
   if (message.content.length != 0) {
     // If the message is "!tldr (link)"
     let msgbody = message.content;
@@ -30,28 +40,83 @@ export const ParseMessage = async message => {
     if (tokens[0] === "!tldr" && tokens[1].length != 0) {
       // process the second token (the link)
       let link = tokens[1];
-
       // Navigate to link
-      await GoToLink(link);
-      OutputMessage(message); 
-    }   
+      const response = await GoToLink(link).then(response => {
+        //when promise is resolved, set message and return
+        console.log("ParseMessage message: " + JSON.stringify(response));
+        return response;
+      });
+      OutputMessage(message.channel, response["message"]);
+    }
   }
 }
 
-/* outputs embedded message to discord chat */
-const OutputMessage = (msg) => {
+/* Generate message embed to discord chat */
+// TODO: deprecated, remove after testing
+export const OutputMessage = (channel, summary) => {
   // create MessageEmbed instance
   const embed = new MessageEmbed()
     .setTitle('A slick little embed')   // Set the title of the field
     .setColor(0xff0000)                 // Set the color of the embed
-    .setDescription('Hello, this is a slick embed!');   // Set the main content of the embed
+    .setDescription(summary);   // Set the main content of the embed
   
   // Send the embed to the same channel as the message
-  msg.channel.send(embed);
+  channel.send(embed);
+}
+
+/**
+ * parses message text for summon and returns a URL or empty string
+ * @param {Object} message Discord message object
+ * @returns {String} URL or empty string for invalid URLs
+ */
+export const ParseMessage =  message => {
+  //check if message is summoning the bot
+  if(message.content.startsWith("!tldr")){
+    //split message into tokens
+    let tokens = message.content.split(" ");
+    //check if second token exists
+    if(tokens[1] && tokens[1].length != 0){
+      if (tokens[1].match(regex)) {
+        //valid url
+        console.log("Valid URL!");
+        return tokens[1];
+      } else {
+        //invalid url (check lines 19-20 for reference)
+        console.error("Invalid URL!");
+        //send message to channel:
+        message.channel.send("Invalid URL Provided!");
+        return "";
+      }
+    }
+  }
+}
+
+/**
+ * Creates an embedded message based on parameters and sends it to specified channel
+ * @param {Object} channel The channel to send message to
+ * @param {Object} embedObj Message object of the form:
+ * (color, title, description)
+ */
+export const GenerateMessageEmbed = (channel, embedObj) =>{
+  //console.log(embedObj["color"].toString(16));
+
+  const embed = new MessageEmbed()
+    .setColor(embedObj["color"])          // set embed color (success or fail color)
+    .setTitle(embedObj["title"])           // set title of field
+    .setDescription(embedObj["description"])   // set message content
+
+  channel.send(embed);
 }
 
 /* Creates a page instance */
-const GoToLink = async link => {
+/**
+ * Goes to link, extracts <p> tags, 
+ * ping server api and returns promise with server response
+ * @param {String} link link for puppeteer to access
+ * @returns {Promise} promise containing summary or error response
+ * //TODO: not a modular function pls fix
+ */
+export const GoToLink = async link => {
   // Create a browser instance and page instance
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
@@ -80,17 +145,32 @@ const GoToLink = async link => {
   let texts_json = {};
   for(let i in texts) {
     texts_json[i] = texts[i];
+    //console.log(`${i} = ${texts_json[i]}`);
   }
 
-  for(let i in texts_json){
-    console.log(`${i} = ${texts_json[i]}`);
+  //check if texts_json is empty
+  if(Object.keys(texts_json).length !== 0){
+    //console.log("texts_json is NOT empty");
+    return fetch(`${API_URL}/datatext`, {
+      method: "POST",
+      body: JSON.stringify(texts_json)
+    })
+    .then((response) => {
+      //console.log(response);
+      if(!response.ok){
+        //throw error for catch block
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }else{
+        return response.json();
+      }
+    })
+    .catch(e => {
+      //fetch error
+      console.log("Error with fetch: " + e.message);
+      return e;
+    });
+  }else{
+    //console.log("texts_json is empty");
+    return Promise.reject('No Summarizable text found.');
   }
-
-  // Send data to backend for processing
-  fetch(`${API_URL}/datatext`, {
-    method: "POST",
-    body: JSON.stringify(texts_json)
-  })
-  .then((response) => response.json())
-  .then(data => console.log(data))
 }
