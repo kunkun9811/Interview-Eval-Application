@@ -16,7 +16,8 @@ import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
 
 var API_URL = 'http://127.0.0.1:5000/';
-var expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+var expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi; // with http
+//var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi                   // without http
 var regex = new RegExp(expression);
 
 //TODO: deprecated; remove after testing
@@ -47,6 +48,18 @@ export const ParseMessageOld = async message => {
   }
 }
 
+/* Generate message embed to discord chat */
+// TODO: deprecated, remove after testing
+export const OutputMessage = (channel, summary) => {
+  // create MessageEmbed instance
+  const embed = new MessageEmbed()
+    .setTitle('A slick little embed')   // Set the title of the field
+    .setColor(0xff0000)                 // Set the color of the embed
+    .setDescription(summary);   // Set the main content of the embed
+  
+  // Send the embed to the same channel as the message
+  channel.send(embed);
+}
 
 /**
  * parses message text for summon and returns a URL or empty string
@@ -65,26 +78,14 @@ export const ParseMessage =  message => {
         console.log("Valid URL!");
         return tokens[1];
       } else {
-        //invalid url
+        //invalid url (check lines 19-20 for reference)
         console.error("Invalid URL!");
+        //send message to channel:
         message.channel.send("Invalid URL Provided!");
         return "";
       }
     }
   }
-}
-
-/* Generate message embed to discord chat */
-// TODO: deprecated, remove after testing
-export const OutputMessage = (channel, summary) => {
-  // create MessageEmbed instance
-  const embed = new MessageEmbed()
-    .setTitle('A slick little embed')   // Set the title of the field
-    .setColor(0xff0000)                 // Set the color of the embed
-    .setDescription(summary);   // Set the main content of the embed
-  
-  // Send the embed to the same channel as the message
-  channel.send(embed);
 }
 
 /**
