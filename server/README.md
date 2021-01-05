@@ -23,13 +23,13 @@ optional? `conda init powershell/bash/shellname`
 
 ### on Windows CMD
 
-`C:\path\to\file>set FLASK_APP=server.py`
-`flask run`
+`C:\path\to\app> set FLASK_APP=server.py`
+`C:\path\to\app> flask run`
 
 ### on Windows Powershell
 
 `PS C:\path\to\app> $env:FLASK_APP = "server.py"`
-`$ flask run`
+`PS C:\path\to\app> flask run`
 
 ### on Mac
 
