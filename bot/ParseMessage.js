@@ -16,9 +16,14 @@ import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
 
 var API_URL = 'http://127.0.0.1:5000/';
+var expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+var regex = new RegExp(expression);
+
+//TODO: deprecated; remove after testing
 // Input: !tldr SOME_LINK
 // Output: Some summary of the article/website/etc
-export const ParseMessage = async message => {
+
+export const ParseMessageOld = async message => {
   if (message.content.length != 0) {
     // If the message is "!tldr (link)"
     let msgbody = message.content;
@@ -31,22 +36,47 @@ export const ParseMessage = async message => {
     if (tokens[0] === "!tldr" && tokens[1].length != 0) {
       // process the second token (the link)
       let link = tokens[1];
-      //TODO: return link, go to link in TLDRbot.js 
-      //TODO: output "Going to: (url.com)"
       // Navigate to link
       const response = await GoToLink(link).then(response => {
         //when promise is resolved, set message and return
         console.log("ParseMessage message: " + JSON.stringify(response));
         return response;
       });
-      //TODO: Output message in TLDRbot.js
-      OutputMessage(message, response["message"]);
+      OutputMessage(message.channel, response["message"]);
     }
   }
 }
 
-/* outputs embedded message to discord chat */
-export const OutputMessage = (msg, summary) => {
+
+/**
+ * parses message text for summon and returns a URL or empty string
+ * @param {Object} message Discord message object
+ * @returns {String} URL or empty string for invalid URLs
+ */
+export const ParseMessage =  message => {
+  //check if message is summoning the bot
+  if(message.content.startsWith("!tldr")){
+    //split message into tokens
+    let tokens = message.content.split(" ");
+    //check if second token exists
+    if(tokens[1] && tokens[1].length != 0){
+      if (tokens[1].match(regex)) {
+        //valid url
+        console.log("Valid URL!");
+        return tokens[1];
+      } else {
+        //invalid url
+        console.error("Invalid URL!");
+        message.channel.send("Invalid URL Provided!");
+        return "";
+      }
+    }
+  }
+}
+
+/* Generate message embed to discord chat */
+// TODO: deprecated, remove after testing
+export const OutputMessage = (channel, summary) => {
   // create MessageEmbed instance
   const embed = new MessageEmbed()
     .setTitle('A slick little embed')   // Set the title of the field
@@ -54,10 +84,34 @@ export const OutputMessage = (msg, summary) => {
     .setDescription(summary);   // Set the main content of the embed
   
   // Send the embed to the same channel as the message
-  msg.channel.send(embed);
+  channel.send(embed);
+}
+
+/**
+ * Creates an embedded message based on parameters and sends it to specified channel
+ * @param {Object} channel The channel to send message to
+ * @param {Object} embedObj Message object of the form:
+ * (color, title, description)
+ */
+export const GenerateMessageEmbed = (channel, embedObj) =>{
+  //console.log(embedObj["color"].toString(16));
+
+  const embed = new MessageEmbed()
+    .setColor(embedObj["color"])          // set embed color (success or fail color)
+    .setTitle(embedObj["title"])           // set title of field
+    .setDescription(embedObj["description"])   // set message content
+
+  channel.send(embed);
 }
 
 /* Creates a page instance */
+/**
+ * Goes to link, extracts <p> tags, 
+ * ping server api and returns promise with server response
+ * @param {String} link link for puppeteer to access
+ * @returns {Promise} promise containing summary or error response
+ * //TODO: not a modular function pls fix
+ */
 export const GoToLink = async link => {
   // Create a browser instance and page instance
   const browser = await puppeteer.launch({ headless: true });
@@ -87,31 +141,32 @@ export const GoToLink = async link => {
   let texts_json = {};
   for(let i in texts) {
     texts_json[i] = texts[i];
+    //console.log(`${i} = ${texts_json[i]}`);
   }
 
-  for(let i in texts_json){
-    console.log(`${i} = ${texts_json[i]}`);
+  //check if texts_json is empty
+  if(Object.keys(texts_json).length !== 0){
+    //console.log("texts_json is NOT empty");
+    return fetch(`${API_URL}/datatext`, {
+      method: "POST",
+      body: JSON.stringify(texts_json)
+    })
+    .then((response) => {
+      //console.log(response);
+      if(!response.ok){
+        //throw error for catch block
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }else{
+        return response.json();
+      }
+    })
+    .catch(e => {
+      //fetch error
+      console.log("Error with fetch: " + e.message);
+      return e;
+    });
+  }else{
+    //console.log("texts_json is empty");
+    return Promise.reject('No Summarizable text found.');
   }
-
-  return fetch(`${API_URL}/datatext`, {
-    method: "POST",
-    body: JSON.stringify(texts_json)
-  })
-  .then((response) => {
-    if(!response.ok){
-      //throw error for catch block
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }else{
-      return response.json();
-    }
-  })
-  .then(responseJson => {
-    //console.log("logging data: " + JSON.stringify(responseJson));
-    return responseJson;
-  })
-  .catch(e => {
-    //catch errors in fetch
-    console.log("Error with fetch: " + e.message);
-    return e;
-  });
 }
