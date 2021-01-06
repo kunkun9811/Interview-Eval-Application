@@ -96,7 +96,6 @@ export const ParseMessage =  message => {
  */
 export const GenerateMessageEmbed = (channel, embedObj) =>{
   //console.log(embedObj["color"].toString(16));
-
   const embed = new MessageEmbed()
     .setColor(embedObj["color"])          // set embed color (success or fail color)
     .setTitle(embedObj["title"])           // set title of field
@@ -164,7 +163,7 @@ export const GoToLink = async link => {
     .catch(e => {
       //fetch error
       console.log("Error with fetch: " + e.message);
-      return e;
+      return Promise.reject("Error with fetch: " + e.message);
     });
   }else{
     //console.log("texts_json is empty");
