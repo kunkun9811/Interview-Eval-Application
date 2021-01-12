@@ -55,7 +55,7 @@ def upload_file():
         for key, value in text.items():
             article += value + " "
         # prepreocess text from article
-        article = clean_text(article)
+        # article = clean_text(article)
         writeToFile(article, fileName)
 
         print("written to file")
