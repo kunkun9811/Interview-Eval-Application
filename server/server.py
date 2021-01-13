@@ -2,8 +2,10 @@ from flask import Flask, request, make_response, jsonify
 import json
 import pandas as pd
 import re
-from bs4 import BeautifulSoup
-from helper import contraction_mapping, stop_words
+from nltk.tokenize import sent_tokenize
+from bs4 import BeautifulSoup # used in clean text function (Deprecated)
+# from helper import contraction_mapping, stop_words
+from helper_functions import *
 
 app = Flask(__name__)
 
@@ -13,11 +15,53 @@ def writeToFile(article: str, fileName: str):
     f.close()
 
 def generateSummary(fileName: str) -> str:
-    f = open(fileName, "r")
-    message = f.readline()
-    f.close()
+    with open("testarticle.txt", "r", encoding="utf-8") as file:
+        text = file.read()
+
+    text = sent_tokenize(text)
+    print("Text:")
+    print(text[:20], "\n")
+    total_documents = len(text)
+
+    # Calculate Frequency Matrix
+    freq_matrix = create_frequency_matrix(text)
+    # print("Frequency Matrix:")
+    # print(list(freq_matrix)[:5], "\n")
+
+    # Create Term Frequency Matrix
+    tf_matrix = create_tf_matrix(freq_matrix)
+    # print("Term Frequency Matrix:")
+    # print(list(tf_matrix)[:5], "\n")
+
+    # Create Document counts per word Matrix
+    doc_per_word = create_documents_per_words(freq_matrix)
+    # print("Number of documents each word appear in:")
+    # print(list(doc_per_word)[:5], "\n")
+
+    # Create Inverse Document Frequency Matrix
+    idf_matrix = create_idf_matrix(freq_matrix, doc_per_word, total_documents)
+    # print("IDF Matrix:")
+    # print(list(idf_matrix)[:5], "\n")
+
+    # Create TF-IDF matrix
+    tf_idf_matrix = create_tf_idf_matrix(tf_matrix, idf_matrix)
+    # print("TF-IDF Matrix:")
+    # print(list(tf_idf_matrix)[:5], "\n")
+
+    # Score each sentence
+    sentenceScores = score_sentences(tf_idf_matrix)
+    # print("Scores of each sentence:")
+    # print(list(sentenceScores)[:5], "\n")
+
+    # Calculate the threshold to select important sentences for summary
+    threshold = find_average_score(sentenceScores)
+    # print("threshold:")
+    # print(threshold, "\n")
+
+    # Generate the summary
+    summary = generate_summary(text, sentenceScores, threshold)
     # print(message[:35])
-    return message
+    return summary
 
 def clean_text(text: str) -> str:
     processedString = text.lower()
